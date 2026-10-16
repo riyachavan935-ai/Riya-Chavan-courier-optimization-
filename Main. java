@@ -1,0 +1,85 @@
+package com.courier.main;
+import com.courier.model.Courier;
+import com.courier.service.CourierService;
+import com.courier.algorithm.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        CourierService service = new CourierService();
+        
+        System.out.println("==================================================");
+        System.out.println("  COURIER LOGISTICS & DELIVERY OPTIMIZATION SYSTEM");
+        System.out.println("  Project By: Riya Chavan - Roll No 3121");
+        System.out.println("  Inspired by Meesho Logistics System");
+        System.out.println("==================================================");
+        
+        service.getNetwork().displayGraph();
+
+        boolean running = true;
+        while(running) {
+            System.out.println("\n========== MAIN MENU ==========");
+            System.out.println("1. Book Courier (Meesho Type Checkout)");
+            System.out.println("2. Track Courier (Live Tracking)");
+            System.out.println("3. View All Couriers (Admin Panel)");
+            System.out.println("4. Update Courier Status");
+            System.out.println("5. Optimize Route (Dijkstra Demo)");
+            System.out.println("6. Generate Report (Cost & Distance Saved)");
+            System.out.println("7. View Network Graph");
+            System.out.println("8. Exit");
+            System.out.print("Enter Choice: ");
+            
+            int choice = 0;
+            try { choice = sc.nextInt(); } catch(Exception e){ sc.nextLine(); continue; }
+            sc.nextLine();
+
+            switch(choice) {
+                case 1:
+                    System.out.print("Sender Name: "); String sender = sc.nextLine();
+                    System.out.print("Receiver Name: "); String receiver = sc.nextLine();
+                    System.out.print("From City (Mumbai/Pune/Nashik/Nagpur): "); String from = sc.nextLine();
+                    System.out.print("To City: "); String to = sc.nextLine();
+                    System.out.print("Weight (KG): "); double weight = sc.nextDouble(); sc.nextLine();
+                    System.out.print("Service (Standard/Express/Same Day): "); String serviceType = sc.nextLine();
+                    Courier c = service.bookCourier(sender, receiver, from, to, weight, serviceType);
+                    c.displayCourier();
+                    break;
+                case 2:
+                    System.out.print("Enter Tracking ID (e.g. CR1001): "); String tid = sc.nextLine();
+                    Courier tracked = service.trackCourier(tid);
+                    if(tracked != null) tracked.displayCourier();
+                    else System.out.println("Courier Not Found!");
+                    break;
+                case 3:
+                    System.out.println("\n=== All Couriers ===");
+                    for(Courier courier : service.getAllCouriers()) courier.displayCourier();
+                    break;
+                case 4:
+                    System.out.print("Enter Tracking ID: "); String uid = sc.nextLine();
+                    System.out.print("New Status (IN-TRANSIT/DELIVERED): "); String status = sc.nextLine();
+                    System.out.print("Current Location: "); String loc = sc.nextLine();
+                    service.updateStatus(uid, status, loc);
+                    break;
+                case 5:
+                    System.out.print("From City: "); String f = sc.nextLine();
+                    System.out.print("To City: "); String t = sc.nextLine();
+                    DeliveryOptimizer.compareRoutes(service.getNetwork(), f, t);
+                    break;
+                case 6:
+                    service.generateReport();
+                    break;
+                case 7:
+                    service.getNetwork().displayGraph();
+                    break;
+                case 8:
+                    running = false;
+                    System.out.println("Thank You! Project by Riya Chavan 3121");
+                    break;
+                default:
+                    System.out.println("Invalid Choice!");
+            }
+        }
+        sc.close();
+    }
+}
